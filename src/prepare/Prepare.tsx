@@ -1,8 +1,6 @@
-import react,{ChangeEvent, MouseEventHandler, ReactEventHandler, SyntheticEvent, useState} from "react";
+import react,{ChangeEvent, MouseEventHandler, ReactEventHandler, useState} from "react";
 import { Button, TextField } from "@mui/material";
 import {useNavigate} from "react-router-dom";
-
-const URL:string = "";
 
 interface TokenRequest{
     room: string;
@@ -30,25 +28,25 @@ const Prepare = () =>{
             room,
             user:username,
         } ;
-        const res = await fetch(URL,{
+        await fetch("/token",{
+            method: "POST",
+            headers:{
+                'Content-Type': 'application/json',
+            },
             body: JSON.stringify(req)
-        }).then(res=>{
-            const tmp: any = res.json();
-            return {
-                token: tmp.token,
-                errors: tmp.errors
+        }).then(res=>res.json()).then((body)=>{
+            if(body.errors){
+                throw body.errors;
             }
-        })
-        if(res.errors.length!==0||res.token===""){
-            console.error("failed",res.errors);
-        }else{
             navigate("/room",{
                 state:{
-                    token: res.token
+                    token: body.token
                 }
             });
-        }
-        setPressed(p=>!p);
+        }).catch(err=>{
+            console.error(err);
+            setPressed(p=>!p);
+        })
     }
 
     return (
