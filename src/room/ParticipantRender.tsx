@@ -9,7 +9,7 @@ interface ParticipantRenderProps {
     participant:Participant;
 }
 
-const ParticipantRender = ({participant}:ParticipantRenderProps) =>{
+const ParticipantRender = ({participant}:any) =>{
     const {isLocal,cameraPublication,isSpeaking}:ParticipantState = useParticipant(participant);
     if(cameraPublication?.track){
         // NOTE: divで囲わないとなぜか表示されない

@@ -1,24 +1,24 @@
-import react, { MouseEventHandler, useEffect, useState } from "react";
+import React, { MouseEventHandler, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { AudioRenderer, LiveKitRoom, ParticipantState, useParticipant, useRoom, VideoRenderer,ControlsProps} from "livekit-react";
+import { AudioRenderer, useRoom, } from "livekit-react";
 // Roomをコンポーネントとして定義しているので別の名前(RoomClass)に置き換えている
-import { Room as RoomClass} from "livekit-client";
 import ParticipantRender from "./ParticipantRender";
+import { Room } from "livekit-client";
 
 // Livekit-serverのurl(ws)
 const LiveKitServerURL: string = "ws://localhost:7880";
 
 
-const Room = ()=>{
+const RoomView = ()=>{
     // tokenを取得している
     // NOTE: もっと綺麗なやり方があったら教えて欲しい
     const location = useLocation();
     const state: any= location.state;
     const token: string = state.token;
 
-    const {connect,isConnecting,participants,audioTracks,room} = useRoom();
+    const {connect,isConnecting,participants,audioTracks,room,error} = useRoom();
 
-    const handleConnected = async (room: RoomClass) =>{
+    const handleConnected = async (room: any) =>{
         await room.localParticipant.setCameraEnabled(true);
         await room.localParticipant.setMicrophoneEnabled(true);
     }
@@ -43,6 +43,8 @@ const Room = ()=>{
             if(!room) return;
             handleConnected(room);
             return ()=> room.disconnect();
+        }).catch(err=>{
+            console.error(err);
         })
     },[]);
 
@@ -50,6 +52,7 @@ const Room = ()=>{
 
     return (
         <div>
+            {error&&<p>{error.message}{error.name}{error.stack}</p>}
             <p>member: {participants.length}</p>
             {/* ビデオ・音声出力 */}
             {participants.map((participant)=>{
@@ -73,4 +76,4 @@ const Room = ()=>{
     )
 }
 
-export default Room;
+export default RoomView;
